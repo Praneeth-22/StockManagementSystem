@@ -11,7 +11,7 @@ import java.util.List;
 @RequestMapping("/api/items") // This annotation specifies the base URL for all endpoints in this controller.
                               // // This means that all endpoints in this controller will be prefixed with
                               // "/api/items".
-@CrossOrigin(origins = "http://localhost:5173") // This annotation allows cross-origin requests from the specified
+@CrossOrigin(origins = "*") // This annotation allows cross-origin requests from the specified
                                                 // origin (the Vite frontend running on port 5173). // This is necessary
                                                 // to enable communication between the frontend and backend when they
                                                 // are running on different ports during development.
