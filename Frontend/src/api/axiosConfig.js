@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api', // Points to your Spring Boot Server
+  // baseURL: 'http://localhost:8080/api', // Points to your Spring Boot Server
+   baseURL: 'https://stockmanagementsystem-yakm.onrender.com/api/', // Points to your Spring Boot Server
   headers: {
     'Content-Type': 'application/json', 
   },
