@@ -1,0 +1,34 @@
+/* Reset standard margins */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #f0f2f5; 
+  /* background-image: url('./Img/pfc.png'); */
+  /* Ensures the image covers the entire screen at all times */
+  background-size: cover;
+  
+  /* Keeps the image centered even when resizing */
+  background-position: center;
+  
+  /* Prevents the image from repeating (tiling) */
+  background-repeat: no-repeat;
+  
+  /* Optional: Fixes the image so it doesn't scroll with the content */
+  background-attachment: fixed;
+}
+
+/* This container forces the content to the center of the screen */
+.dashboard-container {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically */
+  min-height: 100vh;       /* Take up full viewport height */
+  padding: 20px;           /* Prevent content from touching edges on mobile */
+}
+
+.dashboard-content {
+  width: 100%;
+  max-width: 1200px;       /* Limit width on very large screens */
+}
+

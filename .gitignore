@@ -1,0 +1,21 @@
+# --- Frontend (React) ---
+Frontend/node_modules/
+Frontend/dist/
+Frontend/build/
+Frontend/.env
+Frontend/.DS_Store
+
+# --- Backend (Java/Spring) ---
+BackendService/target/
+BackendService/.mvn/wrapper/maven-wrapper.properties
+BackendService/.settings/
+BackendService/.classpath
+BackendService/.project
+BackendService/out/
+*.class
+*.log
+
+# --- IDEs ---
+.idea/
+.vscode/
+*.swp
