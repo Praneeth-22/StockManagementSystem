@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Layout,
   Menu,
@@ -12,6 +12,7 @@ import {
   message,
 
 } from "antd";
+import { LoadingOutlined } from '@ant-design/icons';
 import { HomeOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import {
   InfoCircleOutlined,
@@ -29,7 +30,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { categories } from "../Constants/Categories";
 import { submitOrder } from "../Redux/OrdersSlice";
-
+import { fetchItems } from "../Redux/InventorySlice";
 const { Header, Content, Footer } = Layout;
 const { Meta } = Card;
 const { Title } = Typography;
@@ -37,7 +38,7 @@ const { Title } = Typography;
 const MakeOrder = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+const antIcon = <LoadingOutlined style={{ fontSize: 40 }} spin />;
   // Navigation Items
   const menuItems = [
     {
@@ -62,7 +63,9 @@ const MakeOrder = () => {
 
   // 1. Get all items from Redux
   const allItems = useSelector((state) => state.inventory.items);
-
+useEffect(() => {
+    dispatch(fetchItems());
+  }, [dispatch]);
   // 2. Local State for the "Cart" (current selection)
   // Format: { 'itemId_1': 5, 'itemId_2': 1 }
   const [cart, setCart] = useState({});
@@ -151,6 +154,20 @@ const MakeOrder = () => {
         />
       </Header>
       <Content style={{ padding: "20px", paddingBottom: "80px" }}>
+      {allItems.length === 0 && (
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'column',
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      minHeight: '50vh' 
+    }}>
+      <Spin indicator={antIcon} tip="Connecting to database..." size="large" />
+      <div style={{ marginTop: '15px', color: '#8c8c8c' }}>
+        Render free servers may take a few seconds to wake up.
+      </div>
+    </div>
+  )}
         {categories.map((category) => {
           // Filter items for this category
           const categoryItems = allItems.filter(
