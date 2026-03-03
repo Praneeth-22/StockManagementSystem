@@ -1,23 +1,26 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../api/axiosConfig';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api from "../api/axiosConfig";
 
 //1. Add async thunk for fetching items from the backend
-export const fetchItems = createAsyncThunk('inventory/fetchItems', async () => {
-  const response = await api.get('/items');
+export const fetchItems = createAsyncThunk("inventory/fetchItems", async () => {
+  const response = await api.get("/items");
   return response.data; // This is the list of items from MongoDB
 });
 
 //2. Add async thunk for adding a new item to the backend
-export const addItem = createAsyncThunk('inventory/addItem', async (newItem) => {
-  const response = await api.post('/items', newItem);
-  return response.data; // This is the saved item from MongoDB (with the new _id)
-});
+export const addItem = createAsyncThunk(
+  "inventory/addItem",
+  async (newItem) => {
+    const response = await api.post("/items", newItem);
+    return response.data; // This is the saved item from MongoDB (with the new _id)
+  },
+);
 const itemsSlice = createSlice({
-  name: 'inventory',
+  name: "inventory",
   initialState: {
     items: [],
-    status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
-    error: null
+    status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
+    error: null,
   },
   reducers: {
     // Standard reducers (synchronous) go here if needed
@@ -26,14 +29,17 @@ const itemsSlice = createSlice({
     builder
       // Handle Fetching
       .addCase(fetchItems.pending, (state) => {
-        state.status = 'loading';
+        state.status = "loading";
       })
       .addCase(fetchItems.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.items = action.payload; // Replace Redux state with real Database data
+        state.status = "succeeded";
+        state.items = action.payload.map((item) => ({
+          ...item,
+          id: item._id || item.id, // normalize id
+        }));
       })
       .addCase(fetchItems.rejected, (state, action) => {
-        state.status = 'failed';
+        state.status = "failed";
         state.error = action.error.message;
       })
       // Handle Adding

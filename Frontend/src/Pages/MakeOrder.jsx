@@ -104,7 +104,7 @@ const MakeOrder = () => {
     }
 
     const orderItems = Object.entries(cart).map(([itemId, qty]) => {
-      const itemDetails = allItems.find((i) => i._id === itemId);
+      const itemDetails = allItems.find((i) => i.id === itemId);
       return { ...itemDetails, qty };
     });
 
@@ -226,10 +226,10 @@ const MakeOrder = () => {
 
                 <Row gutter={[16, 16]}>
                   {categoryItems.map((item) => {
-                    const qty = cart[item._id] || 0;
+                    const qty = cart[item.id] || 0;
 
                     return (
-                      <Col xs={24} sm={12} md={12} lg={8} key={item._id}>
+                      <Col xs={24} sm={12} md={12} lg={8} key={item.id}>
                         <Badge count={qty} offset={[-5, 5]}>
                           <Card
                             hoverable
@@ -321,7 +321,7 @@ const MakeOrder = () => {
                                   type={qty > 0 ? "primary" : "default"}
                                   icon={<PlusOutlined />}
                                   onClick={() =>
-                                    updateQuantity(item._id, 1)
+                                    updateQuantity(item.id, 1)
                                   }
                                 />
                               </div>
