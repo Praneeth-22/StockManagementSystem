@@ -1,8 +1,11 @@
 export const categories = [
-  'Grill', 
+  'Grill Items', 
   'Chicken Fry', 
+  'Sea Food',
   'Sauces', 
-  'Cake', 
+  'Cake & Desserts', 
+  'Drinks',
+  'Breads',
   'Vegetables', 
   'Utilities'
 ];
