@@ -30,7 +30,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { categories } from "../Constants/Categories";
 import { submitOrder } from "../Redux/OrdersSlice";
-import { fetchItems } from "../Redux/InventorySlice";
+import { fetchItems } from "../Redux/OrdersSlice";
 const { Header, Content, Footer } = Layout;
 const { Meta } = Card;
 const { Title } = Typography;
