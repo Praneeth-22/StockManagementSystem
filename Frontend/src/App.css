@@ -32,3 +32,19 @@ body, html {
   max-width: 1200px;       /* Limit width on very large screens */
 }
 
+/* Desktop: Hide the mobile button */
+@media (min-width: 768px) {
+  .show-on-mobile {
+    display: none !important;
+  }
+}
+
+/* Mobile: Hide the horizontal menu and show the hamburger icon */
+@media (max-width: 767px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
+  .show-on-mobile {
+    display: block !important;
+  }
+}

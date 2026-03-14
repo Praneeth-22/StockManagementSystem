@@ -1,12 +1,13 @@
 import React, { useState,useEffect } from 'react';
-import { Layout, Menu, List, Card, Modal, Button, Typography, Tag, Divider, Descriptions } from 'antd';
+import { Layout, Menu, List, Card, Modal, Button, Typography, Tag, Divider, Descriptions , Drawer} from 'antd';
 import { 
   UnorderedListOutlined,
   HomeOutlined, 
   HistoryOutlined, 
   CalendarOutlined,
   CheckCircleOutlined,
-  SyncOutlined
+  SyncOutlined,
+  MenuOutlined
 } from '@ant-design/icons';
 import { 
   PlusCircleOutlined, 
@@ -17,12 +18,17 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchOrders } from '../Redux/OrdersSlice';
+import '../App.css'
+
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
 
 const PreviousOrders = () => {
   const navigate = useNavigate();
      // Navigation Items
+     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+const toggleDrawer = () => setIsDrawerOpen(!isDrawerOpen);
   const menuItems = [
     { key: 'home', label: 'Dashboard', icon: <HomeOutlined />, onClick: () => navigate('/') },
     { key: 'list', label: 'Add Item', icon: <PlusCircleOutlined />, onClick: () => navigate('/add-item') },
@@ -56,15 +62,52 @@ useEffect(() => {
 
 return (
     <Layout style={{ minHeight: '100vh', background: '#f0f2f5' }}>
-       <Header style={{ display: 'flex', alignItems: 'center' ,justifyContent: 'space-between',width: '100%'}}>
-             <Menu
-               theme="dark"
-               mode="horizontal"
-               defaultSelectedKeys={['2']}
-               items={menuItems}
-               style={{ flex: 1, minWidth: 0 }}
-             />
-       </Header>
+      <Header style={{ 
+  display: 'flex', 
+  alignItems: 'center', 
+  justifyContent: 'space-between', 
+  width: '100%', 
+  padding: '0 20px' 
+}}>
+  <div style={{ color: 'white', fontSize: '18px', fontWeight: 'bold' }}>
+    StockApp
+  </div>
+
+  {/* --- Desktop Menu: Right-aligned and hidden on mobile --- */}
+  <Menu
+    theme="dark"
+    mode="horizontal"
+    defaultSelectedKeys={['2']}
+    items={menuItems}
+    style={{ flex: 1, minWidth: 0, justifyContent: 'flex-end' }}
+    className="hide-on-mobile"
+  />
+
+  {/* --- Mobile Button: Hamburger icon shown only on mobile --- */}
+  <Button
+    className="show-on-mobile"
+    type="text"
+    icon={<MenuOutlined style={{ color: 'white', fontSize: '22px' }} />}
+    onClick={toggleDrawer}
+  />
+
+  {/* --- Mobile Drawer Navigation --- */}
+  <Drawer
+    title="Navigation"
+    placement="right"
+    onClose={toggleDrawer}
+    open={isDrawerOpen}
+    styles={{ body: { padding: 0 } }}
+    width={250}
+  >
+    <Menu
+      mode="vertical"
+      defaultSelectedKeys={['2']}
+      items={menuItems}
+      onClick={toggleDrawer} // Closes drawer when a link is clicked
+    />
+  </Drawer>
+</Header>
 
       <Content style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>

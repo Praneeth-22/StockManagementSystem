@@ -1,13 +1,15 @@
 import React from 'react';
+import { useState } from 'react';
 import { Form, Input, Button, Layout, Menu, Select, message, Card } from 'antd'; // Added Select
 import { HomeOutlined, UnorderedListOutlined } from '@ant-design/icons';
-import { ShoppingCartOutlined,  AuditOutlined } from '@ant-design/icons';
-
+import { ShoppingCartOutlined,  AuditOutlined ,HistoryOutlined} from '@ant-design/icons';
+import {  Drawer } from 'antd';
+import { MenuOutlined } from '@ant-design/icons';
 import { categories } from '../Constants/Categories';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { addItem } from '../Redux/itemsSlice' // Ensure this path matches your folder structure
-
+import '../App.css'
 const { Header, Content } = Layout;
 const { TextArea } = Input;
 const { Option } = Select;
@@ -23,6 +25,7 @@ const AddItem = () => {
     { key: 'home', label: 'Dashboard', icon: <HomeOutlined />, onClick: () => navigate('/') },
     { key: 'list', label: 'Make Order', icon: <ShoppingCartOutlined />, onClick: () => navigate('/make-order') },
      { key: 'list', label: 'Review Order', icon: <AuditOutlined/>, onClick: () => navigate('/review-order') },
+      { key: 'list', label: 'Previous Orders', icon: <HistoryOutlined />, onClick: () => navigate('/previous-orders') },
   ];
 
   const onFinish = (values) => {
@@ -45,22 +48,58 @@ dispatch(addItem(newItem)).unwrap().then(() => {
     // message.success('Item added successfully!');
     form.resetFields();
   };
+//
+const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+const toggleMobileMenu = () => {
+  setIsMobileMenuOpen(!isMobileMenuOpen);
+};
   return (
     <Layout className="layout" style={{ minHeight: '100vh' }}>
-      <Header style={{ display: 'flex', alignItems: 'center' ,justifyContent: 'space-between',width: '100%'}}>
-        {/* <div style={{ color: 'white', fontSize: '18px', marginRight: '30px', fontWeight: 'bold' }}>
-          StockApp
-        </div> */}
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          defaultSelectedKeys={['2']}
-          items={menuItems}
-          style={{ flex: 1, minWidth: 0 }}
-        />
-      </Header>
+      
+<Header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px' }}>
+  <div style={{ color: 'white', fontSize: '18px', fontWeight: 'bold' }}>
+    StockApp
+  </div>
 
+  {/* --- Desktop Menu (Hidden on mobile) --- */}
+  <div className="desktop-menu" style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+    <Menu
+      theme="dark"
+      mode="horizontal"
+      defaultSelectedKeys={['home']}
+      items={menuItems}
+      style={{ minWidth: 0, display: 'flex', justifyContent: 'flex-end' }}
+      className="hide-on-mobile"
+    />
+  </div>
+
+  {/* --- Mobile Menu Button (Hidden on desktop) --- */}
+  <Button
+    className="show-on-mobile"
+    type="text"
+    icon={<MenuOutlined style={{ color: 'white', fontSize: '20px' }} />}
+    onClick={toggleMobileMenu}
+    style={{ display: 'none' }} // We will control this with CSS below
+  />
+
+  {/* --- Mobile Sidebar (Drawer) --- */}
+  <Drawer
+    title="Navigation"
+    placement="right"
+    onClose={toggleMobileMenu}
+    open={isMobileMenuOpen}
+    styles={{ body: { padding: 0 } }} // Removes default padding for the menu
+    width={250}
+  >
+    <Menu
+      mode="vertical"
+      defaultSelectedKeys={['home']}
+      items={menuItems}
+      onClick={() => setIsMobileMenuOpen(false)} // Close drawer when item clicked
+    />
+  </Drawer>
+</Header>
       <Content style={{ padding: '50px' }}>
         <div className="site-layout-content" style={{ maxWidth: '600px', margin: '0 auto' }}>
           <Card title="Add New Item" bordered={false} style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>

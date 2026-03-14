@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, Menu, List, Card, Modal, Button, Typography, Tag, Space, message, Popconfirm, Tooltip, Input } from 'antd';
+import { Layout, Menu, List, Card, Modal, Button, Typography, Tag, Space, message, Popconfirm, Tooltip, Input, Drawer } from 'antd';
 import { 
   HomeOutlined, 
   EditOutlined, 
@@ -8,7 +8,7 @@ import {
   SaveOutlined,
   MinusCircleOutlined,
   CheckCircleOutlined,
-  FileTextOutlined // Icon for Remarks
+  FileTextOutlined ,MenuOutlined, HighlightOutlined
 } from '@ant-design/icons';
 import { 
   PlusCircleOutlined, 
@@ -17,6 +17,7 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { updateOrder, deleteOrder } from '../Redux/OrdersSlice';
+import '../App.css'
 
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
@@ -26,10 +27,15 @@ const ReviewOrder = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+
+const toggleDrawer = () => setIsDrawerVisible(!isDrawerVisible);
   const menuItems = [
     { key: 'home', label: 'Dashboard', icon: <HomeOutlined />, onClick: () => navigate('/') },
     { key: 'list', label: 'Add Item', icon: <PlusCircleOutlined />, onClick: () => navigate('/add-item') },
     { key: 'list', label: 'Make Order', icon: <ShoppingCartOutlined />, onClick: () => navigate('/make-order') },
+    
+    {}
   ];
 
   const allOrders = useSelector((state) => state.orders.history);
@@ -121,9 +127,52 @@ const ReviewOrder = () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-       <Header style={{ display: 'flex', alignItems: 'center' ,justifyContent: 'space-between',width: '100%'}}>
-           <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']} items={menuItems} style={{ flex: 1, minWidth: 0 }} />
-       </Header>
+       <Header style={{ 
+  display: 'flex', 
+  alignItems: 'center', 
+  justifyContent: 'space-between', 
+  width: '100%', 
+  padding: '0 20px' 
+}}>
+  <div style={{ color: 'white', fontSize: '18px', fontWeight: 'bold' }}>
+    StockApp
+  </div>
+
+  {/* --- Desktop Menu: Hidden on mobile via CSS --- */}
+  <Menu 
+    theme="dark" 
+    mode="horizontal" 
+    defaultSelectedKeys={['2']} 
+    items={menuItems} 
+    style={{ flex: 1, minWidth: 0, justifyContent: 'flex-end' }} 
+    className="hide-on-mobile"
+  />
+
+  {/* --- Mobile Button: Shown only on mobile via CSS --- */}
+  <Button
+    className="show-on-mobile"
+    type="text"
+    icon={<MenuOutlined style={{ color: 'white', fontSize: '22px' }} />}
+    onClick={toggleDrawer}
+  />
+
+  {/* --- Mobile Drawer (Sidebar) --- */}
+  <Drawer
+    title="Navigation"
+    placement="right"
+    onClose={toggleDrawer}
+    open={isDrawerVisible}
+    styles={{ body: { padding: 0 } }}
+    width={250}
+  >
+    <Menu
+      mode="vertical"
+      defaultSelectedKeys={['2']}
+      items={menuItems}
+      onClick={toggleDrawer} // Closes drawer when a user clicks a link
+    />
+  </Drawer>
+</Header>
 
       <Content style={{ padding: '20px', maxWidth: '800px', margin: '0 auto', width: '100%' }}>
         <Title level={3}>Pending Orders</Title>

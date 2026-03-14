@@ -11,6 +11,7 @@ import {
   Badge,
   message,
   Spin,
+  Drawer,
 } from "antd";
 
 import {
@@ -22,6 +23,8 @@ import {
   PlusOutlined,
   SaveOutlined,
   LoadingOutlined,
+  MenuOutlined,
+  HistoryOutlined,
 } from "@ant-design/icons";
 
 import { useSelector, useDispatch } from "react-redux";
@@ -29,6 +32,7 @@ import { useNavigate } from "react-router-dom";
 import { categories } from "../Constants/Categories";
 import { submitOrder } from "../Redux/OrdersSlice";
 import { fetchItems } from "../Redux/itemsSlice";
+import "../App.css";
 
 const { Header, Content, Footer } = Layout;
 const { Title } = Typography;
@@ -42,9 +46,11 @@ const MakeOrder = () => {
   /* ===============================
      Redux State
   =============================== */
-  const { items: allItems, status, error } = useSelector(
-    (state) => state.inventory
-  );
+  const {
+    items: allItems,
+    status,
+    error,
+  } = useSelector((state) => state.inventory);
 
   useEffect(() => {
     dispatch(fetchItems());
@@ -53,6 +59,10 @@ const MakeOrder = () => {
   /* ===============================
      Navigation Menu
   =============================== */
+  const [visible, setVisible] = useState(false);
+
+  const showDrawer = () => setVisible(true);
+  const onClose = () => setVisible(false);
   const menuItems = [
     {
       key: "home",
@@ -72,6 +82,12 @@ const MakeOrder = () => {
       icon: <AuditOutlined />,
       onClick: () => navigate("/review-order"),
     },
+    {
+      key: "previous",
+      label: "Previous Orders",
+      icon: <HistoryOutlined />,
+      onClick: () => navigate("/previous-orders"),
+    },
   ];
 
   /* ===============================
@@ -80,19 +96,24 @@ const MakeOrder = () => {
   =============================== */
   const [cart, setCart] = useState({});
 
-  const updateQuantity = (itemId, change) => {
-    setCart((prev) => {
-      const currentQty = prev[itemId] || 0;
-      const newQty = Math.max(0, currentQty + change);
+const updateQuantity = (itemId, change) => {
+  setCart((prev) => {
+    const id = String(itemId);
+    const currentQty = prev[id] || 0;
+    const newQty = currentQty + change;
 
-      if (newQty === 0) {
-        const { [itemId]: _, ...rest } = prev;
-        return rest;
-      }
+    const newCart = { ...prev };
 
-      return { ...prev, [itemId]: newQty };
-    });
-  };
+    if (newQty <= 0) {
+      console.log("Removing item:", id);
+      delete newCart[id];
+    } else {
+      newCart[id] = newQty;
+    }
+
+    return newCart;
+  });
+};
 
   /* ===============================
      Save Order
@@ -104,7 +125,8 @@ const MakeOrder = () => {
     }
 
     const orderItems = Object.entries(cart).map(([itemId, qty]) => {
-      const itemDetails = allItems.find((i) => i.id === itemId);
+      console.log(allItems);
+     const itemDetails = allItems.find((i) => i.id === itemId);
       return { ...itemDetails, qty };
     });
 
@@ -112,6 +134,7 @@ const MakeOrder = () => {
       date: new Date().toISOString(),
       items: orderItems,
       totalItems: orderItems.reduce((acc, item) => acc + item.qty, 0),
+      status: 'Pending'
     };
 
     dispatch(submitOrder(newOrder))
@@ -158,15 +181,52 @@ const MakeOrder = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
+          padding: "0 20px",
         }}
       >
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          defaultSelectedKeys={["home"]}
-          items={menuItems}
-          style={{ flex: 1 }}
+        <div style={{ color: "white", fontSize: "18px", fontWeight: "bold" }}>
+          StockApp
+        </div>
+
+        {/* --- Desktop Menu (Hidden on mobile via CSS) --- */}
+        <div
+          className="desktop-menu"
+          style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}
+        >
+          <Menu
+            theme="dark"
+            mode="horizontal"
+            defaultSelectedKeys={["home"]}
+            items={menuItems}
+            style={{ minWidth: 0, flex: 1, justifyContent: "flex-end" }}
+            className="hide-on-mobile"
+          />
+        </div>
+
+        {/* --- Mobile Hamburger Button (Shown only on mobile) --- */}
+        <Button
+          className="show-on-mobile"
+          type="text"
+          icon={<MenuOutlined style={{ color: "white", fontSize: "20px" }} />}
+          onClick={showDrawer}
         />
+
+        {/* --- Mobile Drawer Navigation --- */}
+        <Drawer
+          title="Menu"
+          placement="right"
+          onClose={onClose}
+          open={visible}
+          styles={{ body: { padding: 0 } }}
+          width={250}
+        >
+          <Menu
+            mode="vertical"
+            defaultSelectedKeys={["home"]}
+            items={menuItems}
+            onClick={onClose} // Closes drawer when a link is clicked
+          />
+        </Drawer>
       </Header>
 
       {/* Content */}
@@ -207,7 +267,7 @@ const MakeOrder = () => {
         {status === "succeeded" &&
           categories.map((category) => {
             const categoryItems = allItems.filter(
-              (item) => item.category === category
+              (item) => item.category === category,
             );
 
             if (categoryItems.length === 0) return null;
@@ -227,10 +287,9 @@ const MakeOrder = () => {
                 <Row gutter={[16, 16]}>
                   {categoryItems.map((item) => {
                     const qty = cart[item.id] || 0;
-
                     return (
                       <Col xs={24} sm={12} md={12} lg={8} key={item.id}>
-                        <Badge count={qty} offset={[-5, 5]}>
+  <Badge key={item.id} count={qty} offset={[-5, 5]}>
                           <Card
                             hoverable
                             style={{
@@ -239,8 +298,7 @@ const MakeOrder = () => {
                                 qty > 0
                                   ? "1px solid #1677ff"
                                   : "1px solid #f0f0f0",
-                              backgroundColor:
-                                qty > 0 ? "#f0f5ff" : "#fff",
+                              backgroundColor: qty > 0 ? "#f0f5ff" : "#fff",
                               transition: "all 0.3s ease",
                             }}
                             bodyStyle={{ padding: "16px" }}
@@ -298,9 +356,7 @@ const MakeOrder = () => {
                                   size="small"
                                   icon={<MinusOutlined />}
                                   disabled={qty === 0}
-                                  onClick={() =>
-                                    updateQuantity(item._id, -1)
-                                  }
+                                  onClick={() => updateQuantity(item.id, -1)}
                                 />
 
                                 <span
@@ -308,8 +364,7 @@ const MakeOrder = () => {
                                     fontWeight: "bold",
                                     minWidth: "24px",
                                     textAlign: "center",
-                                    color:
-                                      qty > 0 ? "#1677ff" : "#000",
+                                    color: qty > 0 ? "#1677ff" : "#000",
                                   }}
                                 >
                                   {qty}
@@ -320,9 +375,7 @@ const MakeOrder = () => {
                                   size="small"
                                   type={qty > 0 ? "primary" : "default"}
                                   icon={<PlusOutlined />}
-                                  onClick={() =>
-                                    updateQuantity(item.id, 1)
-                                  }
+                                 onClick={() => updateQuantity(item.id, 1)}
                                 />
                               </div>
                             </div>
@@ -361,8 +414,7 @@ const MakeOrder = () => {
             fontSize: "18px",
           }}
         >
-          Save Order (
-          {Object.values(cart).reduce((a, b) => a + b, 0)} Items)
+          Save Order ({Object.values(cart).reduce((a, b) => a + b, 0)} Items)
         </Button>
       </Footer>
     </Layout>
